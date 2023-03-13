@@ -9,9 +9,9 @@ class TodoController extends Controller
 {
     public function index()
     {
-        // return view('todo.index');
         $todos = Todo::where('user_id', auth()->user()->id)->get();
-        return $todos;
+        dd($todos);
+        return view('todo.index');
     }
     public function create()
     {
