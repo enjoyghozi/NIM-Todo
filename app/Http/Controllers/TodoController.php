@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todo;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class TodoController extends Controller
@@ -21,7 +22,8 @@ class TodoController extends Controller
     }
     public function create()
     {
-        return view('todo.create');
+        $categories = Category::where('user_id', auth()->user()->id)->get();
+        return view('todo.create', compact('categories'));
     }
     public function store(Request $request, Todo $todo)
     {
@@ -47,14 +49,17 @@ class TodoController extends Controller
         $todo = Todo::create([
             'title' => ucfirst($request->title),
             'user_id' => auth()->user()->id,
+            'category_id' => $request->category_id
         ]);
+        // dd($todo);
         return redirect()->route('todo.index')->with('success', 'Todo created successfully!');
     }
     public function edit(Todo $todo)
     {
+        $categories = Category::where('user_id', auth()->user()->id)->get();
         if (auth()->user()->id == $todo->user_id) {
             // dd($todo);
-            return view('todo.edit', compact('todo'));
+            return view('todo.edit', compact('todo', 'categories'));
         } else {
             // abort(403);
             // abort(403, 'Not authorized');
@@ -75,6 +80,7 @@ class TodoController extends Controller
         // Eloquent Way - Readable
         $todo->update([
             'title' => ucfirst($request->title),
+            'category_id' => $request->category_id
         ]);
         return redirect()->route('todo.index')->with('success', 'Todo updated successfully!');
     }
